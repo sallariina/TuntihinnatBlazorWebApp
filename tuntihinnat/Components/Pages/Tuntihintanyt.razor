@@ -1,0 +1,29 @@
+﻿@if (tuntihinta != null)
+{
+    <p>Sähkön hinta nyt: @tuntihinta.price.ToString("#0.000") snt/kWh</p>
+}
+else
+{
+    <p>Sähkön hinta nyt:</p>
+}
+
+@code {
+    private Tuntihinta tuntihinta = new Tuntihinta();
+    private HttpClient httpClient = new HttpClient();
+    String url = "https://api.porssisahko.net/v1/price.json?date=2024-10-17&hour=";
+    private async Task FetchData()
+    {
+        tuntihinta = await httpClient.GetFromJsonAsync<Tuntihinta>("https://api.porssisahko.net/v1/price.json?date="+DateTime.Now.ToString("yyyy-MM-dd")+"&hour="+(DateTime.Now.Hour-1));
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private class Tuntihinta
+    {
+        public double price { get; set; }
+    }
+
+}

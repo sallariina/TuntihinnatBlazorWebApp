@@ -1,0 +1,58 @@
+﻿@page "/tuntihinnat"
+<PageTitle>Tuntihinnat tänään</PageTitle>
+<h4>Sähkön tuntihinnat tänään (@paivanyt.ToString("dd.MM.yyyy")): </h4>
+
+@if (tuntihinnat != null)
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Tunti</th>
+                <th>Hinta snt/kWh</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tuntihinta in tuntihinnat.prices.Reverse())
+            {
+                if (@tuntihinta.endDate.ToLocalTime().Date == DateTime.Now.Date)
+                {
+                    <tr>
+                        <td>@tuntihinta.startDate.ToLocalTime().ToString("HH.mm") - @tuntihinta.endDate.ToLocalTime().ToString("HH.mm")</td>
+                        <td>@tuntihinta.price.ToString("#0.000")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>...</p>
+}
+
+@code {
+    private DateTime paivanyt = DateTime.Now;
+    private Prices tuntihinnat;
+    public HttpClient httpClient = new HttpClient();
+    public async Task FetchData()
+    {
+        tuntihinnat = await httpClient.GetFromJsonAsync<Prices>("https://api.porssisahko.net/v1/latest-prices.json");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    public class Prices
+    {
+        public Tuntihinta[] prices { get; set; }
+    }
+
+    public class Tuntihinta
+    {
+        public double price { get; set; }
+        public DateTime startDate { get; set; }
+        public DateTime endDate { get; set; }
+    }
+}

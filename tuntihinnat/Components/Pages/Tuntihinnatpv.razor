@@ -14,7 +14,7 @@
         <tbody>
             @foreach (var tuntihinta in tuntihinnat.prices.Reverse())
             {
-                if (@tuntihinta.endDate.ToLocalTime().Date == DateTime.Now.Date)
+                if (@tuntihinta.startDate.ToLocalTime().Date == DateTime.Now.Date)
                 {
                     <tr>
                         <td>@tuntihinta.startDate.ToLocalTime().ToString("HH.mm") - @tuntihinta.endDate.ToLocalTime().ToString("HH.mm")</td>
